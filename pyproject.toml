@@ -1,0 +1,16 @@
+[project]
+name = "fitgpu"
+version = "0.1.0"
+description = "Check if a HuggingFace model fits in your GPU"
+requires-python = ">=3.10"
+dependencies = [
+    "huggingface-hub",
+    "pynvml",
+]
+
+[project.scripts]
+fitgpu = "fitgpu:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
