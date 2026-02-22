@@ -18,9 +18,9 @@ def fmt(b):
         b /= 1024
 
 
-def get_model_size(model_id):
+def get_model_size(model_id, token=None):
     # get model weight size in bytes from HuggingFace (no download)
-    info = model_info(model_id, files_metadata=True)
+    info = model_info(model_id, files_metadata=True, token=token)
     total = 0
     for sib in info.siblings or []:
         if sib.rfilename.endswith((".safetensors", ".bin")):
@@ -47,15 +47,25 @@ def get_gpus():
 
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
-        print("usage: fitgpu <model_id>")
+    args = sys.argv[1:]
+    token = None
+
+    if "--token" in args:
+        idx = args.index("--token")
+        if idx + 1 >= len(args):
+            sys.exit("error: --token requires a value")
+        token = args.pop(idx + 1)
+        args.pop(idx)
+
+    if not args or args[0] in ("-h", "--help"):
+        print("usage: fitgpu <model_id> [--token TOKEN]")
         print("  e.g. fitgpu google/gemma-2-2b")
         sys.exit(0)
 
-    model_id = sys.argv[1]
+    model_id = args[0]
     print(f"model : {model_id}")
 
-    size = get_model_size(model_id)
+    size = get_model_size(model_id, token=token)
     print(f"size  : {fmt(size)} (weights on disk)")
 
     try:
